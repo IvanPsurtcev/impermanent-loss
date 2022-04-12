@@ -15,8 +15,9 @@ contract Vault is NFT {
     address public token1;
     address public token2;
 
+    // добавить collateral
     mapping(address => uint256) public NFTids;
-    mapping(address => uint256) public collaterals;
+    mapping(address => uint256) public collaterals; // не нужно знать
 
     // здесь вместо захардкоженных цифр должны быть взяты значения с оракулов, но как это сделать не знаю
     constructor(IERC20 _stablecoin, address _token1, address _token2) NFT(_token1, _token2, _stablecoin, 1, 1, 10) { 
@@ -29,11 +30,11 @@ contract Vault is NFT {
         //require(collateralValue > 1000, "Collateral value too low!");
         stablecoin.safeTransferFrom(msg.sender, address(this), collateralValue);
         collaterals[msg.sender] = collateralValue;
-        uint256 nftId;
+        uint256 nftId; // сделать глобальное 
         mint(msg.sender, nftId, 1, abi.encodePacked(msg.sender)); 
         NFTids[msg.sender] = nftId;
         nftId += 1;
-        return NFTids[msg.sender];
+        return NFTids[msg.sender]; // можно возвращать NFTid
     }
 
     function redeemCollateral(uint256 nftId) external returns (uint256) {
@@ -48,6 +49,7 @@ contract Vault is NFT {
         require(_checkStatusNFT(nftId) == true, "Not available for liquidation");
         uint256 netValue = _checkNAV(nftId);
         stablecoin.safeTransferFrom(address(this), msg.sender, netValue); // интересно узнать как правильно
+        // burn
     }
 
     function _checkNAV(uint256 nftId) private returns (uint256) {
@@ -59,7 +61,7 @@ contract Vault is NFT {
     function _checkStatusNFT(uint256 nftId) private returns (bool) {
         uint256 netValue = _checkNAV(nftId) * 100;
         uint256 collateral = collaterals[msg.sender] * 100;
-        if (netValue / collateral < 20) { //есть вопросы по округлению
+        if (netValue / collateral < 20) { 
             return true;
         } else {
             return false;

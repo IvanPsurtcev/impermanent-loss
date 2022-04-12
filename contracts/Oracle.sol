@@ -7,7 +7,7 @@ import "./interfaces/IExternalOracle.sol";
 import "./interfaces/IOracle.sol";
 
 contract OracleUniswapV2 is IOracle {
-event SetGovernor(address governor);
+    event SetGovernor(address governor);
     event SetPendingGovernor(address pendingGovernor);
     event Initialize(address token);
     event Observe(address indexed token, uint224 price);
@@ -75,7 +75,7 @@ event SetGovernor(address governor);
     function initPriceFromPair(address token) public {
         Observation storage obs = observations[token];
         require(obs.timestamp == 0, "initPriceFromPair/already-initialized");
-        address pair = IUniswapV2Factory(factory).getPair(token, weth);
+        address pair = IUniswapV2Factory(factory).getPair(token, weth); // token1, token2
         obs.lastCumu = token < weth ? currentPrice0Cumu(pair) : currentPrice1Cumu(pair);
         obs.lastPrice = 0;
         obs.timestamp = uint32(block.timestamp);
